@@ -3,7 +3,7 @@ import React from "react";
 import Task from "../Task/Task";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { updateTaskState } from '../lib/store';
+import { updateTaskState } from "../../lib/store";
 
 export default function TaskList() {
   const tasks = useSelector((state) => {
@@ -40,7 +40,7 @@ export default function TaskList() {
     </div>
   );
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <div className="list-items" data-testid="loading" key={"loading"}>
         {LoadingRow}
@@ -67,11 +67,15 @@ export default function TaskList() {
     );
   }
 
-
   return (
     <div className="list-items" data-testid="success" key={"success"}>
       {tasks.map((task) => (
-        <Task key={task.id} task={task} pinTask={(task) => pinTask(task)} archiveTask={(task) => archiveTask(task)} />
+        <Task
+          key={task.id}
+          task={task}
+          onPinTask={(task) => pinTask(task)}
+          onArchiveTask={(task) => archiveTask(task)}
+        />
       ))}
     </div>
   );
