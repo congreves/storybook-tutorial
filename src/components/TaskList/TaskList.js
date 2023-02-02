@@ -1,69 +1,89 @@
 import React from "react";
 
 import Task from "../Task/Task";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { updateTaskState } from '../lib/store';
 
-export default function TaskList({loading, tasks, onPinTask, onArchiveTask}) {
-const events = {
-    onPinTask,
-    onArchiveTask
-}
-const LoadingRow = (
+export default function TaskList() {
+  const tasks = useSelector((state) => {
+    const tasksInOrder = [
+      ...state.taskbox.tasks.filter((t) => t.state === "TASK_PINNED"),
+      ...state.taskbox.tasks.filter((t) => t.state !== "TASK_PINNED"),
+    ];
+    const filteredTasks = tasksInOrder.filter(
+      (t) => t.state === "TASK_INBOX" || t.state === "TASK_PINNED"
+    );
+    return filteredTasks;
+  });
+
+  const { status } = useSelector((state) => state.taskbox);
+
+  const dispatch = useDispatch();
+
+  const pinTask = (value) => {
+    dispatch(updateTaskState({ id: value, newTaskState: "TASK_PINNED" }));
+  };
+
+  const archiveTask = (value) => {
+    dispatch(updateTaskState({ id: value, newTaskState: "TASK_ARCHIVED" }));
+  };
+  const LoadingRow = (
     <div className="loading-item">
-        <span className="glow-checkbox"/> 
-        <span className="glow-text"> <span>Loading</span><span>cool</span><span>state</span>
-        </span>
-       
-
+      <span className="glow-checkbox" />
+      <span className="glow-text">
+        {" "}
+        <span>Loading</span>
+        <span>cool</span>
+        <span>state</span>
+      </span>
     </div>
-)
+  );
 
-if (loading) {
-    return <div className="list-items" data-testid="loading" key={"loading"}>
+  if (status === 'loading') {
+    return (
+      <div className="list-items" data-testid="loading" key={"loading"}>
         {LoadingRow}
         {LoadingRow}
         {LoadingRow}
         {LoadingRow}
         {LoadingRow}
         {LoadingRow}
-    </div>
-}
+      </div>
+    );
+  }
 
-if(tasks.length === 0) {
-    return <div className="list-items">
+  if (tasks.length === 0) {
+    return (
+      <div className="list-items">
         <div className="list-items" key={"empty"} data-testid="empty">
-            <div className="wrapper-message">
-                <span className="icon-check"/>
-                <p className="title-message">You have no tasks</p>
-                <p className="subtitle-message">Sit back and relax </p>
-            </div>
+          <div className="wrapper-message">
+            <span className="icon-check" />
+            <p className="title-message">You have no tasks</p>
+            <p className="subtitle-message">Sit back and relax </p>
+          </div>
         </div>
+      </div>
+    );
+  }
+
+
+  return (
+    <div className="list-items" data-testid="success" key={"success"}>
+      {tasks.map((task) => (
+        <Task key={task.id} task={task} pinTask={(task) => pinTask(task)} archiveTask={(task) => archiveTask(task)} />
+      ))}
     </div>
-}
-
-const taskInOrder= [
-    ...tasks.filter((t) => t.state === "TASK_PINNED"),
-    ...tasks.filter((t) => t.state !== "TASK_PINNED"),
-
-]
-
-return (
-    <div className="list-items"> 
-        {taskInOrder.map((task) => (
-            <Task  key={task.id} task={task} {...events}/>
-        ))}
-    </div>
-)
-
+  );
 }
 
 TaskList.propTypes = {
-    loading: PropTypes.bool,
-    tasks: PropTypes.arrayOf(Task.propTypes.task).isRequired,
-    onPinTask: PropTypes.func,
-    onArchiveTask: PropTypes.func,
-}
+  loading: PropTypes.bool,
+  tasks: PropTypes.arrayOf(Task.propTypes.task).isRequired,
+  onPinTask: PropTypes.func,
+  onArchiveTask: PropTypes.func,
+};
 
 TaskList.defaultProps = {
-    loading: false,
-}
+  loading: false,
+};
