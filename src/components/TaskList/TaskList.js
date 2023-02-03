@@ -40,7 +40,7 @@ export default function TaskList() {
     </div>
   );
 
-  if (status === "loading") {
+  if (status === 'loading') {
     return (
       <div className="list-items" data-testid="loading" key={"loading"}>
         {LoadingRow}
